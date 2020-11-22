@@ -6,7 +6,31 @@
 
     <groupId>top.jiangyixin</groupId>
     <artifactId>zeus</artifactId>
+    <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
-
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <junit.version>4.12</junit.version>
+    </properties>
+    <modules>
+        <module>zeus-core</module>
+        <module>zeus-server</module>
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>top.jiangyixin</groupId>
+                <artifactId>zeus-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>top.jiangyixin</groupId>
+                <artifactId>zeus-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
