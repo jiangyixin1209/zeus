@@ -12,62 +12,71 @@ public class IdAlloc {
     private Integer step;
     private Boolean active;
     private String description;
+    private Integer version;
     private Date gmtCreate;
     private Date gmtModified;
 
     public String getBizType() {
-      return bizType;
+        return bizType;
     }
 
     public void setBizType(String bizType) {
-      this.bizType = bizType;
+        this.bizType = bizType;
     }
 
     public Long getMaxId() {
-      return maxId;
+        return maxId;
     }
 
     public void setMaxId(Long maxId) {
-      this.maxId = maxId;
+        this.maxId = maxId;
     }
 
     public Integer getStep() {
-      return step;
+        return step;
     }
 
     public void setStep(Integer step) {
-      this.step = step;
+        this.step = step;
     }
 
     public Boolean getActive() {
-      return active;
+        return active;
     }
 
     public void setActive(Boolean active) {
-      this.active = active;
+        this.active = active;
     }
 
     public String getDescription() {
-      return description;
+        return description;
     }
 
     public void setDescription(String description) {
-      this.description = description;
+        this.description = description;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public Date getGmtCreate() {
-        return gmtCreate;
+          return gmtCreate;
       }
 
     public void setGmtCreate(Date gmtCreate) {
-      this.gmtCreate = gmtCreate;
+        this.gmtCreate = gmtCreate;
     }
 
     public Date getGmtModified() {
-      return gmtModified;
+        return gmtModified;
     }
 
     public void setGmtModified(Date gmtModified) {
-      this.gmtModified = gmtModified;
+        this.gmtModified = gmtModified;
     }
 }

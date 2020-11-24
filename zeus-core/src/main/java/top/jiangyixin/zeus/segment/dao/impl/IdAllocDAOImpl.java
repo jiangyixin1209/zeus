@@ -47,18 +47,18 @@ public class IdAllocDAOImpl implements IdAllocDAO {
     }
 
     @Override
-    public IdAlloc updateMaxIdAndGetIdAlloc(String bizType) {
+    public IdAlloc selectIdAllocByBizType(String bizType) {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()){
             IdAllocMapper idAllocMapper = sqlSession.getMapper(IdAllocMapper.class);
-            idAllocMapper.updateMaxId(bizType);
             return idAllocMapper.selectIdAllocByBizType(bizType);
         }
     }
 
     @Override
-    public IdAlloc selectIdAllocByBizType(String bizType) {
+    public IdAlloc updateMaxIdAndGetIdAlloc(String bizType) {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()){
             IdAllocMapper idAllocMapper = sqlSession.getMapper(IdAllocMapper.class);
+            idAllocMapper.updateMaxId(bizType);
             return idAllocMapper.selectIdAllocByBizType(bizType);
         }
     }
