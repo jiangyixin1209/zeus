@@ -1,20 +1,53 @@
 package top.jiangyixin.zeus.segment;
 
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * SegmentBuffer
  * @author jiangyixin
  */
 public class SegmentBuffer {
     private String bizType;
+    /**
+     * 双Buffer缓冲
+     */
     private final Segment[] segments;
+    /**
+     * 当前segment索引
+     */
     private volatile int currentPos;
+    /**
+     * 下一个segment是否已经准备完成
+     */
     private volatile boolean nextReady;
-    private volatile boolean isInit;
+    /**
+     * 是否初始化完成
+     */
+    private volatile boolean initOk;
+    /**
+     * 线程是否在运行中
+     */
+    private final AtomicBoolean threadRunning;
+    private final ReadWriteLock lock;
+    private volatile int step;
+    private volatile int minStep;
+    private volatile long updateTimestamp;
 
     public SegmentBuffer() {
         segments = new Segment[]{new Segment(this), new Segment(this)};
+        currentPos = 0;
+        nextReady = false;
+        initOk = false;
+        threadRunning = new AtomicBoolean(false);
+        lock = new ReentrantReadWriteLock();
     }
 
+    public Segment getCurrentSegment() {
+        return segments[currentPos];
+    }
 
     public String getBizType() {
         return bizType;
@@ -44,11 +77,59 @@ public class SegmentBuffer {
         this.nextReady = nextReady;
     }
 
-    public boolean isInit() {
-        return isInit;
+    public boolean isInitOk() {
+        return initOk;
     }
 
-    public void setInit(boolean init) {
-        isInit = init;
+    public void setInitOk(boolean initOk) {
+        this.initOk = initOk;
+    }
+
+    public AtomicBoolean getThreadRunning() {
+        return threadRunning;
+    }
+
+    public ReadWriteLock getLock() {
+        return lock;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public int getMinStep() {
+        return minStep;
+    }
+
+    public void setMinStep(int minStep) {
+        this.minStep = minStep;
+    }
+
+    public long getUpdateTimestamp() {
+        return updateTimestamp;
+    }
+
+    public void setUpdateTimestamp(long updateTimestamp) {
+        this.updateTimestamp = updateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "SegmentBuffer{" +
+                "bizType='" + bizType + '\'' +
+                ", segments=" + Arrays.toString(segments) +
+                ", currentPos=" + currentPos +
+                ", nextReady=" + nextReady +
+                ", initOk=" + initOk +
+                ", threadRunning=" + threadRunning +
+                ", lock=" + lock +
+                ", step=" + step +
+                ", minStep=" + minStep +
+                ", updateTimestamp=" + updateTimestamp +
+                '}';
     }
 }

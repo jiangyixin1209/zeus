@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Segment {
     private AtomicLong value = new AtomicLong(0);
-    private volatile Long max;
-    private volatile Integer step;
+    private volatile long max;
+    private volatile int step;
     private final SegmentBuffer segmentBuffer;
 
     public Segment(SegmentBuffer buffer) {
@@ -32,19 +32,19 @@ public class Segment {
       this.value = value;
     }
 
-    public Long getMax() {
+    public long getMax() {
       return max;
     }
 
-    public void setMax(Long max) {
+    public void setMax(long max) {
       this.max = max;
     }
 
-    public Integer getStep() {
+    public int getStep() {
       return step;
     }
 
-    public void setStep(Integer step) {
+    public void setStep(int step) {
       this.step = step;
     }
 
