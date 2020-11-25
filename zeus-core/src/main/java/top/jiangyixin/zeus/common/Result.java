@@ -1,4 +1,4 @@
 package top.jiangyixin.zeus.common;
 
-public class IdResult {
+public class Result {
 }
