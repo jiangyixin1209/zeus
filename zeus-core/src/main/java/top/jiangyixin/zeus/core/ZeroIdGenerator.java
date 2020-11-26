@@ -1,4 +1,4 @@
-package top.jiangyixin.zeus;
+package top.jiangyixin.zeus.core;
 
 import java.util.ArrayList;
 import java.util.List;
