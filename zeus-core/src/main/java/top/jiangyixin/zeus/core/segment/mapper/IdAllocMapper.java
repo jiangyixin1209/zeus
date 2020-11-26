@@ -1,7 +1,7 @@
-package top.jiangyixin.zeus.segment.mapper;
+package top.jiangyixin.zeus.core.segment.mapper;
 
 import org.apache.ibatis.annotations.*;
-import top.jiangyixin.zeus.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.segment.model.IdAlloc;
 
 import java.util.List;
 

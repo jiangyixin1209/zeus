@@ -1,4 +1,4 @@
-package top.jiangyixin.zeus.segment.model;
+package top.jiangyixin.zeus.core.segment.model;
 
 import java.util.Date;
 

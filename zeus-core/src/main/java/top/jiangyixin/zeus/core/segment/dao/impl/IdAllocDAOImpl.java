@@ -1,4 +1,4 @@
-package top.jiangyixin.zeus.segment.dao.impl;
+package top.jiangyixin.zeus.core.segment.dao.impl;
 
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -7,9 +7,9 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import top.jiangyixin.zeus.segment.dao.IdAllocDAO;
-import top.jiangyixin.zeus.segment.mapper.IdAllocMapper;
-import top.jiangyixin.zeus.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.segment.mapper.IdAllocMapper;
+import top.jiangyixin.zeus.core.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.segment.dao.IdAllocDAO;
 
 import javax.sql.DataSource;
 import java.util.List;

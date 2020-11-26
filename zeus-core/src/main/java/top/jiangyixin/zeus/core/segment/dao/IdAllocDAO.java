@@ -1,7 +1,7 @@
-package top.jiangyixin.zeus.segment.dao;
+package top.jiangyixin.zeus.core.segment.dao;
 
 import org.apache.ibatis.annotations.Param;
-import top.jiangyixin.zeus.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.segment.model.IdAlloc;
 
 import java.util.List;
 

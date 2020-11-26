@@ -1,4 +1,4 @@
-package top.jiangyixin.zeus.common;
+package top.jiangyixin.zeus.core.common;
 
 public class Result {
 }

@@ -1,15 +1,14 @@
-package top.jiangyixin.zeus.segment;
+package top.jiangyixin.zeus.core.segment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.jiangyixin.zeus.IdGenerator;
-import top.jiangyixin.zeus.segment.dao.IdAllocDAO;
-import top.jiangyixin.zeus.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.IdGenerator;
+import top.jiangyixin.zeus.core.segment.model.IdAlloc;
+import top.jiangyixin.zeus.core.segment.dao.IdAllocDAO;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 

@@ -1,4 +1,4 @@
-package top.jiangyixin.zeus.segment;
+package top.jiangyixin.zeus.core.segment;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
