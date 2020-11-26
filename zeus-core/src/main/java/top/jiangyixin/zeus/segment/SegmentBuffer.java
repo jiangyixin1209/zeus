@@ -2,6 +2,7 @@ package top.jiangyixin.zeus.segment;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -43,6 +44,14 @@ public class SegmentBuffer {
         initOk = false;
         threadRunning = new AtomicBoolean(false);
         lock = new ReentrantReadWriteLock();
+    }
+
+    public int nextPos() {
+        return (currentPos + 1) & 1;
+    }
+
+    public void switchPos() {
+        currentPos = nextPos();
     }
 
     public Segment getCurrentSegment() {
@@ -89,8 +98,12 @@ public class SegmentBuffer {
         return threadRunning;
     }
 
-    public ReadWriteLock getLock() {
-        return lock;
+    public Lock rLock() {
+        return lock.readLock();
+    }
+
+    public Lock wLock() {
+        return lock.writeLock();
     }
 
     public int getStep() {

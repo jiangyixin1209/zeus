@@ -28,7 +28,11 @@ public class SegmentIdGenerator implements IdGenerator {
     /**
      * 业务未在ID Cache中异常码
      */
-    private final static long ID_CACHE_BIZ_TYPE_NOT_FOUND = -3;
+    private final static long ID_CACHE_BIZ_TYPE_NOT_FOUND = -2;
+    /**
+     * SegmentBuffer中的两个Segment均不可用异常码
+     */
+    private static final long ID_TWO_SEGMENTS_NOT_AVAILABLE = -3;
     /**
      * 默认一个Segment维持时间为15分钟（在15分钟内，其中id号段会被消耗完毕）
      */
@@ -41,9 +45,32 @@ public class SegmentIdGenerator implements IdGenerator {
      * 扩容缩容因子
      */
     private static final int GROWTH_FACTOR = 2;
+    /**
+     * 剩余容量
+     */
+    private static final double REMAIN_CAPACITY = 0.8;
     private final Map<String, SegmentBuffer> cache = new ConcurrentHashMap<>();
+    private final ExecutorService executorService = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new SegmentUpdateThreadFactory());
     private volatile boolean initOk = false;
     private IdAllocDAO idAllocDAO;
+
+    /**
+     * 自定义线程工厂
+     */
+    private static class SegmentUpdateThreadFactory implements ThreadFactory {
+
+        private static int threadNumber = 0;
+
+        private static synchronized int nextThreadNumber() {
+            return threadNumber++;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "Update-Segment-Thread-" + nextThreadNumber());
+        }
+    }
+
     @Override
     public boolean init() {
         logger.info("start init segmentIdGenerator ...");
@@ -73,6 +100,7 @@ public class SegmentIdGenerator implements IdGenerator {
                     }
                 }
             }
+            return getIdFromSegmentBuffer(segmentBuffer);
         }
         return ID_CACHE_BIZ_TYPE_NOT_FOUND;
     }
@@ -133,7 +161,7 @@ public class SegmentIdGenerator implements IdGenerator {
      * @param segment     segment
      */
     public void updateSegmentFromDb(String bizType, Segment segment) {
-        logger.info("start update {} segment from db ...", bizType);
+        logger.info("start update {} segment from db, update segment {}", bizType, segment);
         SegmentBuffer segmentBuffer = segment.getSegmentBuffer();
         IdAlloc idAlloc;
         if (!segmentBuffer.isInitOk()) {
@@ -176,5 +204,88 @@ public class SegmentIdGenerator implements IdGenerator {
         segment.setValue(new AtomicLong(value));
         segment.setMax(idAlloc.getMaxId ());
         segment.setStep(segmentBuffer.getStep());
+    }
+
+    public Long getIdFromSegmentBuffer(SegmentBuffer segmentBuffer) {
+        while (true) {
+            segmentBuffer.rLock().lock();
+            try {
+                Segment currentSegment = segmentBuffer.getCurrentSegment();
+                // 判断是否需要预先加载下一个segment
+                if (!segmentBuffer.isNextReady()
+                    && (currentSegment.getIdle() < REMAIN_CAPACITY * currentSegment.getStep())
+                    && segmentBuffer.getThreadRunning().compareAndSet(false, true)) {
+
+                    executorService.execute(() -> {
+                        Segment nextSegment = segmentBuffer.getSegments()[segmentBuffer.nextPos()];
+                        boolean isUpdate = false;
+                        try {
+                            // 加载下一个segment
+                            updateSegmentFromDb(segmentBuffer.getBizType(), nextSegment);
+                            isUpdate = true;
+                        } catch (Exception e) {
+                            logger.error("update {} segment from db error: {}", segmentBuffer.getBizType(), e);
+                        } finally {
+                            if (isUpdate) {
+                                segmentBuffer.wLock().lock();
+                                segmentBuffer.setNextReady(true);
+                                segmentBuffer.getThreadRunning().set(false);
+                                segmentBuffer.wLock().unlock();
+                            } else {
+                                segmentBuffer.getThreadRunning().set(false);
+                            }
+                        }
+                    });
+                }
+                // 如果下一个获取的Id在当前segment中，则直接返回
+                long value = currentSegment.getValue().incrementAndGet();
+                if (value < currentSegment.getMax()) {
+                    return value;
+                }
+            } finally {
+                segmentBuffer.rLock().unlock();
+            }
+            // 如果下一个获取的Id在当前不在segment中
+            waitAndSleep(segmentBuffer);
+            segmentBuffer.wLock().lock();
+            try {
+                Segment currentSegment = segmentBuffer.getCurrentSegment();
+                long value = currentSegment.getValue().get();
+                if (value < currentSegment.getMax()) {
+                    return value;
+                }
+                // 切换下一个segment
+                if (segmentBuffer.isNextReady()) {
+                    segmentBuffer.switchPos();
+                    segmentBuffer.setNextReady(false);
+                } else {
+                    logger.error("Both two segments in {} are not ready!", segmentBuffer);
+                    return ID_TWO_SEGMENTS_NOT_AVAILABLE;
+                }
+            } finally {
+                segmentBuffer.wLock().unlock();
+            }
+        }
+    }
+
+    /**
+     * 等待 segmentBuffer 加载下一个 Segment 线程执行完毕
+     * @param segmentBuffer     segmentBuffer
+     */
+    private void waitAndSleep(SegmentBuffer segmentBuffer) {
+        int roll = 0;
+        while (segmentBuffer.getThreadRunning().get()) {
+            roll += 1;
+            if (roll < 10) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    logger.warn("Thread {} InterruptedException", Thread.currentThread().getName());
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
     }
 }
