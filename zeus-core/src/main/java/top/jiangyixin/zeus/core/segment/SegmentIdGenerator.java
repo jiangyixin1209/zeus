@@ -287,4 +287,12 @@ public class SegmentIdGenerator implements IdGenerator {
             }
         }
     }
+
+    public IdAllocDAO getIdAllocDAO() {
+        return idAllocDAO;
+    }
+
+    public void setIdAllocDAO(IdAllocDAO idAllocDAO) {
+        this.idAllocDAO = idAllocDAO;
+    }
 }

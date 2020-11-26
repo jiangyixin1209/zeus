@@ -14,6 +14,10 @@
     <artifactId>zeus-server</artifactId>
     <dependencies>
         <dependency>
+          <groupId>top.jiangyixin</groupId>
+          <artifactId>zeus-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${springboot.version}</version>
