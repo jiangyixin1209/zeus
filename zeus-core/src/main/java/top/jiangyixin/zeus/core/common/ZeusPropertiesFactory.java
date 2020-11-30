@@ -2,6 +2,7 @@ package top.jiangyixin.zeus.core.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.jiangyixin.zeus.core.exception.ZeusException;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -15,8 +16,9 @@ public class ZeusPropertiesFactory {
     static {
         try {
           PROPERTIES.load(ZeusPropertiesFactory.class.getClassLoader().getResourceAsStream("zeus.properties"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Load zeus.properties error: ", e);
+            throw new ZeusException("Load zeus.properties error");
         }
     }
     public static Properties getProperties() {

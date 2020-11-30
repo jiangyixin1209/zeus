@@ -24,6 +24,7 @@ public class IdAllocDAOImpl implements IdAllocDAO {
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
         Environment environment = new Environment("dev", transactionFactory, dataSource);
         Configuration configuration = new Configuration();
+        configuration.setEnvironment(environment);
         // 设置自动驼峰转换
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.addMapper(IdAllocMapper.class);

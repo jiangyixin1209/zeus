@@ -3,10 +3,12 @@ package top.jiangyixin.zeus.server.service;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import top.jiangyixin.zeus.core.IdGenerator;
 import top.jiangyixin.zeus.core.ZeroIdGenerator;
-import top.jiangyixin.zeus.server.vo.Result;
+import top.jiangyixin.zeus.core.common.Result;
 import top.jiangyixin.zeus.core.common.ZeusPropertiesFactory;
+import top.jiangyixin.zeus.core.exception.ZeusException;
 import top.jiangyixin.zeus.core.segment.SegmentIdGenerator;
 import top.jiangyixin.zeus.core.segment.dao.IdAllocDAO;
 import top.jiangyixin.zeus.core.segment.dao.impl.IdAllocDAOImpl;
@@ -18,6 +20,7 @@ import java.util.Properties;
 /**
  * @author jiangyixin
  */
+@Service
 public class SegmentIdGeneratorService {
 
     private static final Logger logger = LoggerFactory.getLogger(SegmentIdGeneratorService.class);
@@ -28,7 +31,7 @@ public class SegmentIdGeneratorService {
         Properties properties = ZeusPropertiesFactory.getProperties();
         boolean enable = Boolean.parseBoolean(properties.getProperty(Constants.ZEUS_SEGMENT_ENABLE, "true"));
         if (enable) {
-          DruidDataSource druidDataSource = new DruidDataSource();
+            DruidDataSource druidDataSource = new DruidDataSource();
             druidDataSource.setUrl(properties.getProperty(Constants.ZEUS_JDBC_URL));
             druidDataSource.setUsername(properties.getProperty(Constants.ZEUS_JDBC_USERNAME));
             druidDataSource.setPassword(properties.getProperty(Constants.ZEUS_JDBC_PASSWORD));
@@ -39,7 +42,7 @@ public class SegmentIdGeneratorService {
             if (idGenerator.init()) {
                 logger.info("Segment Id Service Init Successfully");
             } else {
-                throw new InitException("Segment Id Service Init Fail");
+                throw new ZeusException("Segment Id Service Init Fail");
             }
         } else {
             idGenerator = new ZeroIdGenerator();
@@ -54,9 +57,8 @@ public class SegmentIdGeneratorService {
         return null;
     }
 
-    public Result getId(String bizType) {
-        long id = idGenerator.nextId(bizType);
-        return id < 0 ? new Result(id, false) : new Result(id, true);
+    public Result<?> getId(String bizType) {
+        return idGenerator.nextId(bizType);
     }
 
 }

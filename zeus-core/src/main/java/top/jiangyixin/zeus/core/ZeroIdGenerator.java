@@ -1,7 +1,6 @@
 package top.jiangyixin.zeus.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import top.jiangyixin.zeus.core.common.Result;
 
 /**
  * @author jianyixin
@@ -13,12 +12,7 @@ public class ZeroIdGenerator implements IdGenerator {
     }
 
     @Override
-    public Long nextId(String bizType) {
-        return 0L;
-    }
-
-    @Override
-    public List<Long> nextId(String bizType, Integer batchSize) {
-      return new ArrayList<Long>(){{add(0L);}};
+    public Result<Long> nextId(String bizType) {
+        return new Result<>(0L, true);
     }
 }

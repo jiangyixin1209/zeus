@@ -1,5 +1,7 @@
 package top.jiangyixin.zeus.core;
 
+import top.jiangyixin.zeus.core.common.Result;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public interface IdGenerator {
      * @param bizType       业务名称
      * @return              id
      */
-    Long nextId(String bizType);
+    Result<Long> nextId(String bizType);
 
     /**
      * 根据业务获取多条id
@@ -28,12 +30,15 @@ public interface IdGenerator {
      * @param batchSize     获取条数
      * @return              id 列表
      */
-    default List<Long> nextId(String bizType, Integer batchSize) {
+    default Result<List<Long>> nextId(String bizType, Integer batchSize) {
         List<Long> idList = new ArrayList<>();
         for (int i = 0; i < batchSize; i++) {
-            idList.add(nextId(bizType));
+            Result<Long> result = nextId(bizType);
+            if (result.isStatus()) {
+                idList.add(result.getData());
+            }
         }
-        return idList;
+        return new Result<>(idList, true);
     }
 
 }

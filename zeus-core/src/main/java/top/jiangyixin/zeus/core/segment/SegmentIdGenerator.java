@@ -3,6 +3,7 @@ package top.jiangyixin.zeus.core.segment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.jiangyixin.zeus.core.IdGenerator;
+import top.jiangyixin.zeus.core.common.Result;
 import top.jiangyixin.zeus.core.segment.model.IdAlloc;
 import top.jiangyixin.zeus.core.segment.dao.IdAllocDAO;
 
@@ -80,9 +81,9 @@ public class SegmentIdGenerator implements IdGenerator {
     }
 
     @Override
-    public Long nextId(String bizType) {
+    public Result<Long> nextId(String bizType) {
         if (!initOk) {
-            return ID_CACHE_INIT_ERROR;
+            return new Result<>(ID_CACHE_INIT_ERROR, false);
         }
         if (cache.containsKey(bizType)) {
             SegmentBuffer segmentBuffer = cache.get(bizType);
@@ -101,7 +102,7 @@ public class SegmentIdGenerator implements IdGenerator {
             }
             return getIdFromSegmentBuffer(segmentBuffer);
         }
-        return ID_CACHE_BIZ_TYPE_NOT_FOUND;
+        return new Result<>(ID_CACHE_BIZ_TYPE_NOT_FOUND, false);
     }
 
     /**
@@ -205,7 +206,7 @@ public class SegmentIdGenerator implements IdGenerator {
         segment.setStep(segmentBuffer.getStep());
     }
 
-    public Long getIdFromSegmentBuffer(SegmentBuffer segmentBuffer) {
+    public Result<Long> getIdFromSegmentBuffer(SegmentBuffer segmentBuffer) {
         while (true) {
             segmentBuffer.rLock().lock();
             try {
@@ -239,7 +240,7 @@ public class SegmentIdGenerator implements IdGenerator {
                 // 如果下一个获取的Id在当前segment中，则直接返回
                 long value = currentSegment.getValue().incrementAndGet();
                 if (value < currentSegment.getMax()) {
-                    return value;
+                    return new Result<>(value, true);
                 }
             } finally {
                 segmentBuffer.rLock().unlock();
@@ -251,7 +252,7 @@ public class SegmentIdGenerator implements IdGenerator {
                 Segment currentSegment = segmentBuffer.getCurrentSegment();
                 long value = currentSegment.getValue().get();
                 if (value < currentSegment.getMax()) {
-                    return value;
+                    return new Result<>(value, true);
                 }
                 // 切换下一个segment
                 if (segmentBuffer.isNextReady()) {
@@ -259,7 +260,7 @@ public class SegmentIdGenerator implements IdGenerator {
                     segmentBuffer.setNextReady(false);
                 } else {
                     logger.error("Both two segments in {} are not ready!", segmentBuffer);
-                    return ID_TWO_SEGMENTS_NOT_AVAILABLE;
+                    return new Result<>(ID_TWO_SEGMENTS_NOT_AVAILABLE, false);
                 }
             } finally {
                 segmentBuffer.wLock().unlock();
