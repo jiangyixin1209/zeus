@@ -57,7 +57,7 @@ public class SegmentIdGeneratorService {
         return null;
     }
 
-    public Result<?> getId(String bizType) {
+    public Result<Long> getId(String bizType) {
         return idGenerator.nextId(bizType);
     }
 

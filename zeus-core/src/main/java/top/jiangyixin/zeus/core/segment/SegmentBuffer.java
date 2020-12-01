@@ -134,7 +134,6 @@ public class SegmentBuffer {
     public String toString() {
         return "SegmentBuffer{" +
                 "bizType='" + bizType + '\'' +
-                ", segments=" + Arrays.toString(segments) +
                 ", currentPos=" + currentPos +
                 ", nextReady=" + nextReady +
                 ", initOk=" + initOk +

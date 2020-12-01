@@ -200,10 +200,11 @@ public class SegmentIdGenerator implements IdGenerator {
             segmentBuffer.setStep(nextStep);
             segmentBuffer.setMinStep(idAlloc.getStep());
         }
-        long value = idAlloc.getMaxId() - segment.getStep();
-        segment.setValue(new AtomicLong(value));
-        segment.setMax(idAlloc.getMaxId ());
+        long value = idAlloc.getMaxId() - segmentBuffer.getStep();
+        segment.getValue().set(value);
+        segment.setMax(idAlloc.getMaxId());
         segment.setStep(segmentBuffer.getStep());
+        logger.info("end update {} segment from db, update segment {}", bizType, segment);
     }
 
     public Result<Long> getIdFromSegmentBuffer(SegmentBuffer segmentBuffer) {
